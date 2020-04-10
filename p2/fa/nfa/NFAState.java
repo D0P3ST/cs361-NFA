@@ -11,6 +11,7 @@ import java.util.Set;
  * Implementation of an NFA State
  * Contains transition functions for moving between this state and its neighbors
  * @author Zachary Gillenwater
+ * @author Chris Miller
  */
 public class NFAState extends State {
     private HashMap<Character, Set<NFAState>> delta;

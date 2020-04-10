@@ -5,6 +5,13 @@ import fa.dfa.DFA;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
+/**
+ * NFA represents a Non-Deterministic Finite Automaton
+ * It holds a start state, final states, and normal states and can be converted to an equivalent DFA
+ *
+ * @author Chris Miller
+ * @author Zachary Gillenwater
+ */
 public class NFA implements NFAInterface {
 
     private Set<NFAState> states = new HashSet<>();
@@ -12,7 +19,8 @@ public class NFA implements NFAInterface {
 	private Set<Character> ordAbc = new HashSet<>();
 
 	/**
-	 * 
+	 * Converts the NFA to an equivalent DFA using a breadth-first algorithm
+	 *
 	 * @return equivalent DFA
 	 */
 	public DFA getDFA(){
@@ -59,6 +67,13 @@ public class NFA implements NFAInterface {
         return equivalent;
     }
 
+	/**
+	 * Convenience function to retrieve a combined set of all NFAStates reachable
+	 * by all NFAStates given in the input set, with the input symbol.
+	 * @param states Set of NFAStates to find the children of
+	 * @param onSymb Symbol to transition on
+	 * @return Combined set of all states reachable by all input states on the input symbol
+	 */
     public Set<NFAState> getChildren(Set<NFAState> states, char onSymb) {
 		Set<NFAState> children = new HashSet<>();
 
@@ -100,8 +115,9 @@ public class NFA implements NFAInterface {
     }
 
 
-	/* (non-Javadoc)
-	 * @see p1.DFAInterface#addStartState(java.lang.String)
+	/**
+	 * Add a state as the start state to the NFA
+	 * @param name is the label of the start state
 	 */
 	@Override
 	public void addStartState(String name){
@@ -114,8 +130,10 @@ public class NFA implements NFAInterface {
 		}
 		start = s;
 	}
-	/* (non-Javadoc)
-	 * @see p1.DFAInterface#addState(java.lang.String)
+
+	/**
+	 * Add a normal state to the NFA by name
+	 * @param name is the label of the state
 	 */
 	@Override
 	public void addState(String name){
@@ -128,8 +146,9 @@ public class NFA implements NFAInterface {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see p1.DFAInterface#addFinalState(java.lang.String)
+	/**
+	 * Add a final state to the NFA
+	 * @param name is the label of the state
 	 */
 	@Override
 	public void addFinalState(String name){
@@ -142,12 +161,19 @@ public class NFA implements NFAInterface {
 		}
 	}
 
+	/**
+	 * Add a state to the NFA from an NFAState
+	 * @param s
+	 */
 	private void addState(NFAState s){
 		states.add(s);
 	}
 
-	/* (non-Javadoc)
-	 * @see p1.DFAInterface#addTransition(p1.State, char, p1.State)
+	/**
+	 * Add a transition to the NFA state
+	 * @param fromState is the label of the state where the transition starts
+	 * @param onSymb is the symbol from the DFA's alphabet.
+	 * @param toState is the label of the state where the transition ends
 	 */
 	@Override
 	public void addTransition(String fromState, char onSymb, String toState){
@@ -183,54 +209,19 @@ public class NFA implements NFAInterface {
 		return ret;
 	}
 
-	/** (non-Javadoc)
-	 * @see p1.DFAInterface#toString()
-	 **/
-	@Override
-	public String toString(){
-
-		String s = "Q = { ";
-		String fStates = "F = { ";
-		for(NFAState state : states){
-			s += state.toString();
-			s +=" ";
-			if(state.isFinal()){
-				fStates +=state.toString();
-				fStates += " ";
-			}
-		}
-		s += "}\n";
-		fStates += "}\n";
-		s += "Sigma = { ";
-		for(char c : ordAbc){
-			s += c + " ";
-		}
-		s += "}\n";
-		//create transition table
-		s += "delta =\n"+String.format("%10s", "");;
-		for(char c : ordAbc){
-			s += String.format("%10s", c);
-		}
-		s+="\n";
-		for(NFAState state : states){
-			s += String.format("%10s",state.toString());
-			for(char c : ordAbc){
-				s += String.format("%10s", state.getTo(c).toString());
-			}
-			s+="\n";
-		}
-		//start state
-		s += "q0 = " + start + "\n";
-		s += fStates;
-		return s;
-	}
-
-
+	/**
+	 * Returns a list of all states in the NFA
+	 * @return Set of NFAStates in the NFA
+	 */
 	@Override
 	public Set<NFAState> getStates() {
 		return states;
 	}
 
+	/**
+	 * Returns a list of all final states in the NFA
+	 * @return Set of final NFAStates in the NFA
+	 */
 	@Override
 	public Set<NFAState> getFinalStates() {
 		Set<NFAState> ret = new LinkedHashSet<NFAState>();
@@ -242,11 +233,19 @@ public class NFA implements NFAInterface {
 		return ret;
 	}
 
+	/**
+	 * Returns the starting state of the NFA
+	 * @return Starting NFAState
+	 */
 	@Override
 	public NFAState getStartState() {
 		return start;
     }
 
+	/**
+	 * Returns the alphabet recognized by the NFA
+	 * @return Alphabet as a Set of Character
+	 */
 	@Override
 	public Set<Character> getABC() {
 		return ordAbc;
