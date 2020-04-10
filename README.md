@@ -26,7 +26,7 @@ $ java fa.dfa.NFADriver ./tests/p2tc2.txt
 $ java fa.dfa.NFADriver ./tests/p2tc3.txt 
 
 ```
-You will be prompted for end, start, and other states, then the transition table. 
+For a custom made test file, you will need the end, start, and other states, then the transition table. 
 Then it will tell if the provided strings are accepted.  
 
 ## Discussion
