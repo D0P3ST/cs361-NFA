@@ -3,6 +3,7 @@ package fa.nfa;
 import fa.State;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -55,7 +56,9 @@ public class NFAState extends State {
     public void addTransition (char onSymb, NFAState toState) {
         // If we there is no transition set for this symbol, make one
         if (delta.get(onSymb) == null) {
-            delta.put(onSymb, Set.of(toState));
+            Set<NFAState> newSet = new HashSet<>();
+            newSet.add(toState);
+            delta.put(onSymb, newSet);
         }
 
         // Else, add to the set we already have

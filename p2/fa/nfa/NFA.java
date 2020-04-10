@@ -1,22 +1,74 @@
 package fa.nfa;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import fa.dfa.DFA;
+
+import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class NFA implements NFAInterface {
 
-    private Set<NFAState> states;
+    private Set<NFAState> states = new HashSet<>();
 	private NFAState start;
-	private Set<Character> ordAbc;
+	private Set<Character> ordAbc = new HashSet<>();
 
-    	/**
+	/**
 	 * 
 	 * @return equivalent DFA
 	 */
 	public DFA getDFA(){
-        states = new LinkedHashSet<DFAState>();
-		ordAbc = new LinkedHashSet<Character>();
+        DFA equivalent = new DFA();
+		Queue<Set<NFAState>> stateQueue = new LinkedBlockingQueue<>();
+		Set<String> visitedNodes = new HashSet<>();
+
+		stateQueue.add(Set.of(this.start));
+		equivalent.addStartState(Set.of(this.start).toString());
+		while (stateQueue.size() > 0) {
+			Set<NFAState> currStates = stateQueue.remove();
+
+			for (char c : this.ordAbc) {
+				Set<NFAState> childStates;
+				if (c != 'e') {
+					childStates = getChildren(currStates, c);
+
+					for (NFAState s : childStates) {
+						childStates.addAll(eClosure(s));
+					}
+
+					if (!visitedNodes.contains(childStates.toString())) {
+						boolean statesAreFinal = false;
+						for (NFAState n : childStates) {
+							if (n.isFinal()) {
+								statesAreFinal = true;
+							}
+						}
+
+						if (statesAreFinal) {
+							equivalent.addFinalState(childStates.toString());
+						} else {
+							equivalent.addState(childStates.toString());
+						}
+
+						stateQueue.add(childStates);
+						visitedNodes.add(childStates.toString());
+					}
+					equivalent.addTransition(currStates.toString(), c, childStates.toString());
+				}
+			}
+
+		}
+        return equivalent;
     }
+
+    public Set<NFAState> getChildren(Set<NFAState> states, char onSymb) {
+		Set<NFAState> children = new HashSet<>();
+
+		for (NFAState n : states) {
+			if (n.getTo(onSymb) != null) {
+				children.addAll(n.getTo(onSymb));
+			}
+		}
+		return children;
+	}
 	
 	/**
 	 * Return delta entries
@@ -25,7 +77,7 @@ public class NFA implements NFAInterface {
 	 * @return a set of sink states
 	 */
 	public Set<NFAState> getToState(NFAState from, char onSymb){
-
+		return from.getTo(onSymb);
     }
 	
 	/**
@@ -34,9 +86,17 @@ public class NFA implements NFAInterface {
 	 * @param s
 	 * @return set of states that can be reached from s on epsilon trans.
 	 */
-	
 	public Set<NFAState> eClosure(NFAState s){
-
+		Set<NFAState> states = new HashSet<>();
+		if (s.getTo('e') != null) {
+			for (NFAState n : s.getTo('e')) {
+				states.add(n);
+				if (!states.contains(n)) {
+					states.addAll(this.eClosure(n));
+				}
+			}
+		}
+		return states;
     }
 
 
